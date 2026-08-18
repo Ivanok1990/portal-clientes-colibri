@@ -109,9 +109,9 @@ npm test
 19 pruebas de la API con **Vitest + Supertest** que cubren autenticación (credenciales
 inválidas, cookie `httpOnly`, sesión activa), protección de rutas (401 sin sesión o con
 token inválido), aislamiento de datos por cliente y validaciones al crear tickets.
-
 Prisma está mockeado, así que **las pruebas corren sin base de datos ni conexión a
 internet**: basta con clonar el repositorio e instalar dependencias.
+28 pruebas automatizadas: 19 de la API y 9 del conector de Odoo.
 
 ## 📖 Documentación de la API (Swagger)
 
