@@ -1,0 +1,79 @@
+// Esquema de la base de datos (Prisma + PostgreSQL).
+// El prototipo usa PostgreSQL gestionado en la nube (Supabase). PostgreSQL es
+// además el mismo motor que utiliza Odoo, lo que facilita la futura integración.
+// La cadena de conexión se lee desde la variable de entorno DATABASE_URL (.env).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  // DATABASE_URL: pooler de transacciones (PgBouncer) para la app en runtime.
+  url       = env("DATABASE_URL")
+  // DIRECT_URL: conexión de sesión, usada por Prisma para las migraciones.
+  directUrl = env("DIRECT_URL")
+}
+
+// Cliente del portal (equivalente a res.partner en Odoo).
+model Client {
+  id            Int            @id @default(autoincrement())
+  name          String
+  email         String         @unique
+  password      String // hash bcrypt
+  company       String
+  projects      Project[]
+  invoices      Invoice[]
+  tickets       Ticket[]
+  notifications Notification[]
+}
+
+// Proyecto (project.project en Odoo).
+model Project {
+  id       Int    @id @default(autoincrement())
+  code     String @unique
+  name     String
+  status   String // En progreso | En revisión | Planificación | Completado
+  owner    String
+  dueDate  String // ISO (YYYY-MM-DD)
+  progress Int
+  client   Client @relation(fields: [clientId], references: [id])
+  clientId Int
+}
+
+// Factura (account.move de tipo factura en Odoo).
+model Invoice {
+  id        Int    @id @default(autoincrement())
+  code      String @unique
+  concept   String
+  amount    Float
+  status    String // Pendiente | Vencida | Pagada
+  issueDate String // ISO
+  client    Client @relation(fields: [clientId], references: [id])
+  clientId  Int
+}
+
+// Ticket de soporte (helpdesk.ticket en Odoo).
+model Ticket {
+  id          Int    @id @default(autoincrement())
+  code        String @unique
+  title       String
+  description String
+  projectName String
+  status      String // Abierto | En proceso | Resuelto
+  priority    String // Alta | Media | Baja
+  createdAt   String // ISO
+  client      Client @relation(fields: [clientId], references: [id])
+  clientId    Int
+}
+
+// Notificación del cliente.
+model Notification {
+  id        Int     @id @default(autoincrement())
+  message   String
+  type      String // proyecto | factura | ticket
+  createdAt String // ISO
+  read      Boolean @default(false)
+  client    Client  @relation(fields: [clientId], references: [id])
+  clientId  Int
+}
