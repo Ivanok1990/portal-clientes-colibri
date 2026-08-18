@@ -25,10 +25,11 @@ portal-clientes-colibri/
 │       ├── app.ts      # construcción de la app (separada del arranque)
 │       ├── index.ts    # arranque del servidor
 │       ├── routes/     # auth, projects, invoices, tickets, notifications
+│       ├── datasource/ # capa intercambiable: PostgreSQL (Prisma) u Odoo
 │       ├── middleware/ # requireAuth (verifica el JWT)
 │       ├── docs/       # especificación OpenAPI
 │       ├── lib/        # helpers de JWT y cliente Prisma
-│       └── __tests__/  # pruebas de la API (Vitest + Supertest)
+│       └── __tests__/  # pruebas de API y del conector Odoo (Vitest + Supertest)
 ├── frontend/           # SPA (React + Vite)
 │   └── src/
 │       ├── pages/      # Login, Dashboard, Proyectos, Facturas, Tickets, Perfil
@@ -106,12 +107,17 @@ inferior y tarjetas. Las notificaciones se consultan desde la campana del encabe
 npm test
 ```
 
-19 pruebas de la API con **Vitest + Supertest** que cubren autenticación (credenciales
-inválidas, cookie `httpOnly`, sesión activa), protección de rutas (401 sin sesión o con
-token inválido), aislamiento de datos por cliente y validaciones al crear tickets.
+**28 pruebas automatizadas** con **Vitest + Supertest**, repartidas así:
+
+- **19 de la API**: autenticación (credenciales inválidas, cookie `httpOnly`, sesión
+  activa), protección de rutas (401 sin sesión o con token inválido), aislamiento de
+  datos entre clientes y validaciones al crear tickets.
+- **9 del conector de Odoo**: el mapeo entre el vocabulario del ERP y el del portal
+  (etapas → estados, `payment_state` → estado de factura, prioridad `'0'–'2'` →
+  Baja/Media/Alta, many2one `[id, nombre]` → campos planos).
+
 Prisma está mockeado, así que **las pruebas corren sin base de datos ni conexión a
 internet**: basta con clonar el repositorio e instalar dependencias.
-28 pruebas automatizadas: 19 de la API y 9 del conector de Odoo.
 
 ## 📖 Documentación de la API (Swagger)
 

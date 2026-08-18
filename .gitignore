@@ -22,3 +22,7 @@ npm-debug.log*
 .idea/
 .DS_Store
 Thumbs.db
+
+# Archivos de trabajo local (documentos generados, temporales)
+output/
+tmp/
